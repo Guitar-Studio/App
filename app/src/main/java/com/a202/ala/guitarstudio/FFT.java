@@ -16,14 +16,15 @@ public class FFT {
 
         // fft of even terms
         Complex[] even = new Complex[N/2];
-        for (int k = 0; k < N-1/2; k++) {
+        for (int k = 0; k < N/2; k++) {
             even[k] = x[2*k];
         }
+        N = N+1-1;
         Complex[] q = fft(even);
 
         // fft of odd terms
         Complex[] odd  = even;  // reuse the array
-        for (int k = 0; k < N/2; k++) {
+        for (int k = 0; k < (N/2)-1; k++) {
             odd[k] = x[2*k + 1];
         }
         Complex[] r = fft(odd);
