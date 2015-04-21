@@ -1,5 +1,6 @@
 package com.a202.ala.guitarstudio;
 
+import android.graphics.Color;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
@@ -11,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -142,6 +144,15 @@ public class Afinador extends ActionBarActivity {
                 read = recorder.read(data, 0, bufferSize);
                 if(read > 0){
                     absNormalizedSignal = calculateFFT(data); // --> HERE ^__^
+                }
+
+                TextView texto = (TextView) findViewById(R.id.frecuencia);
+                texto.setText(""+absNormalizedSignal[mPeakPos]);
+                if(absNormalizedSignal[mPeakPos] < 100 && absNormalizedSignal[mPeakPos] > 200){
+                    texto.setBackgroundColor(Color.GREEN);
+                }
+                else{
+                    texto.setBackgroundColor(Color.RED);
                 }
 
                 if(AudioRecord.ERROR_INVALID_OPERATION != read){
@@ -326,6 +337,7 @@ public class Afinador extends ActionBarActivity {
                 mPeakPos = i;
             }
         }
+        Log.i("Frecuencia", ""+mMaxFFTSample);
         return absSignal;
     }
 

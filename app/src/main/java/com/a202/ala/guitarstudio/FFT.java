@@ -19,7 +19,6 @@ public class FFT {
         for (int k = 0; k < N/2; k++) {
             even[k] = x[2*k];
         }
-        N = N+1-1;
         Complex[] q = fft(even);
 
         // fft of odd terms
