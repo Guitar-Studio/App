@@ -7,6 +7,7 @@ import android.media.MediaRecorder;
 import android.os.Environment;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.test.UiThreadTest;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -106,8 +107,8 @@ public class Afinador extends ActionBarActivity {
 
 
 
-//_______USANDO EL MICRO_______________________________________________
-    public void startRecording(){ //recogerSonido
+    //_______USANDO EL MICRO_______________________________________________
+    public void startRecording(){               //recogerSonido
         recorder = new AudioRecord(MediaRecorder.AudioSource.MIC,
                 RECORDER_SAMPLERATE, RECORDER_CHANNELS,RECORDER_AUDIO_ENCODING, bufferSize);
 
@@ -120,19 +121,31 @@ public class Afinador extends ActionBarActivity {
             public void run() {
                 writeAudioDataToFile();
             }
-        },"AudioRecorder_Thread");
+        });
 
         recordingThread.start();
     }
 
-    private void writeAudioDataToFile(){  //guardarSonido
+    void updateUI(){
+        if(absNormalizedSignal != null){
+            TextView texto = (TextView) findViewById(R.id.frecuencia);
+            texto.setText("" + absNormalizedSignal[mPeakPos]);
+            if (absNormalizedSignal[mPeakPos] > 100 && absNormalizedSignal[mPeakPos] < 200) {
+                texto.setBackgroundColor(Color.GREEN);
+            } else {
+                texto.setBackgroundColor(Color.RED);
+            }
+        }
+    }
+
+    private void writeAudioDataToFile(){        //guardarSonido
         byte data[] = new byte[bufferSize];     //array tipo byte -> está creado para guardar el audio, el sonido
         String filename = getTempFilename();    //donde se va a guardar el sonido (ruta+nombre del archivo)
         FileOutputStream os = null;             //lo lleva a la ruta
 
         try {
             os = new FileOutputStream(filename);
-        } catch (FileNotFoundException e) { //Qué es???????????????????????????????????????????????????????????????????????
+        } catch (FileNotFoundException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -144,16 +157,14 @@ public class Afinador extends ActionBarActivity {
                 read = recorder.read(data, 0, bufferSize);
                 if(read > 0){
                     absNormalizedSignal = calculateFFT(data); // --> HERE ^__^
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            updateUI();
+                        }
+                    });
                 }
 
-                TextView texto = (TextView) findViewById(R.id.frecuencia);
-                texto.setText(""+absNormalizedSignal[mPeakPos]);
-                if(absNormalizedSignal[mPeakPos] < 100 && absNormalizedSignal[mPeakPos] > 200){
-                    texto.setBackgroundColor(Color.GREEN);
-                }
-                else{
-                    texto.setBackgroundColor(Color.RED);
-                }
+
 
                 if(AudioRecord.ERROR_INVALID_OPERATION != read){
                     try {
@@ -180,20 +191,20 @@ public class Afinador extends ActionBarActivity {
             recorder.release();
 
             recorder = null;
-            recordingThread = null;
+            //recordingThread = null;
         }
 
         copyWaveFile(getTempFilename(), getFilename());
         //deleteTempFile();
     }
-//____DEJANDO DE USAR EL MICRO________________________________________
+    //____DEJANDO DE USAR EL MICRO________________________________________
 
-    private void deleteTempFile() { //borrarTemporal
+    private void deleteTempFile() {                 //borrarTemporal
         File file = new File(getTempFilename());
         file.delete();
     }
 
-    private String getTempFilename(){ //cogerTemporal
+    private String getTempFilename(){               //cogerTemporal
         String filepath = Environment.getExternalStorageDirectory().getPath();
         File file = new File(filepath,AUDIO_RECORDER_FOLDER);
 
@@ -259,7 +270,7 @@ public class Afinador extends ActionBarActivity {
             FileOutputStream out, long totalAudioLen,
             long totalDataLen, long longSampleRate, int channels,
             long byteRate) throws IOException {
-        //another code
+            //another code
 
     }
 
