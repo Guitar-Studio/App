@@ -1,5 +1,6 @@
 package com.a202.ala.guitarstudio;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
@@ -46,6 +47,8 @@ public class Afinador extends ActionBarActivity {
     double[] absNormalizedSignal;
     final int mNumberOfFFTPoints = 1024;
 
+    Intent i;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +65,7 @@ public class Afinador extends ActionBarActivity {
             bufferSize = mNumberOfFFTPoints*2;
         }
 
+        i = new Intent(this, Minijuego.class);
 
         //audioData = new short [bufferSize]; //short array that pcm data is put into.
 
@@ -93,6 +97,7 @@ public class Afinador extends ActionBarActivity {
     private void setButtonHandlers() {
         ((Button)findViewById(R.id.btStart)).setOnClickListener(btnClick);
         ((Button)findViewById(R.id.btStop)).setOnClickListener(btnClick);
+        ((Button)findViewById(R.id.saltarMinijuego)).setOnClickListener(btnClick);
     }
 
 
@@ -289,7 +294,11 @@ public class Afinador extends ActionBarActivity {
                     stopRecording();
                     //calculate();
                     break;
-
+                }
+                case R.id.saltarMinijuego:{
+                    Log.i("AVISO", "Saltar minijuego");
+                    startActivity(i);
+                    break;
                 }
             }
         }
